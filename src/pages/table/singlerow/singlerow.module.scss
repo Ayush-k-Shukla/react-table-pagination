@@ -1,0 +1,38 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+
+  .name {
+    width: 40%;
+    display: flex;
+    gap: 15px;
+    .details {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      flex-wrap: wrap;
+    }
+  }
+
+  .status {
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .role {
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 10px;
+    width: 20%;
+    justify-content: space-around;
+  }
+}

@@ -1,0 +1,107 @@
+.parent {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  .parentWrapper {
+    display: flex;
+    justify-content: center;
+
+    width: 70%;
+    flex-direction: column;
+    border: 1px dotted black;
+    border-radius: 15px;
+
+    .tableContent {
+      display: flex;
+      gap: 15px;
+      flex-direction: column;
+      width: 100%;
+
+      .colums {
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        padding: 10px;
+        align-items: center;
+        .name {
+          display: flex;
+          align-items: center;
+          width: 40%;
+          justify-content: center;
+          cursor: pointer;
+          gap: 10px;
+        }
+        .status {
+          display: flex;
+          align-items: center;
+          width: 20%;
+          justify-content: center;
+          cursor: pointer;
+          gap: 10px;
+        }
+        .role {
+          display: flex;
+          align-items: center;
+          width: 20%;
+          justify-content: center;
+          cursor: pointer;
+          gap: 10px;
+        }
+        .login {
+          display: flex;
+          align-items: center;
+          width: 20%;
+          justify-content: center;
+          cursor: pointer;
+          gap: 10px;
+        }
+      }
+    }
+
+    .tableHeader {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 15px;
+      align-items: center;
+      gap: 10px;
+
+      .leftHeader {
+        display: flex;
+        flex-direction: column;
+
+        .top {
+          display: flex;
+          gap: 10px;
+        }
+        .bottom {
+          display: flex;
+        }
+      }
+
+      .rightHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+    }
+  }
+}
+.devider {
+  width: 100%;
+  border-color: #f6f5fe;
+  opacity: 0.4;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+.addUser {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+}

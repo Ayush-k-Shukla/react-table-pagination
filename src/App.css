@@ -1,0 +1,28 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.primary-text-color-large {
+  color: crimson;
+  font-weight: 700;
+  font-size: large;
+}
+.primary-text-color-larger {
+  color: crimson;
+  font-weight: 600;
+  font-size: larger;
+}
+
+.secondary-text-color-small {
+  color: brown;
+  font-weight: 500;
+  font-size: small;
+}
+.secondary-text-color-large {
+  color: brown;
+  font-weight: 600;
+  font-size: medium;
+}
