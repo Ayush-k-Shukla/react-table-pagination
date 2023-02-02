@@ -1,4 +1,4 @@
-import { Button, IconButton } from '@mui/material';
+import { Button, CircularProgress, IconButton } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { ReactNode } from 'react';
 
@@ -10,6 +10,7 @@ interface PropTypes {
   appendIcon?: JSX.Element;
   size?: 'small' | 'medium' | 'large';
   variant: 'outlined' | 'contained';
+  loading?: boolean;
 }
 
 const CustomButton = ({
@@ -20,6 +21,7 @@ const CustomButton = ({
   size = 'medium',
   variant,
   handleClick,
+  loading = false,
 }: PropTypes) => {
   return (
     <div
@@ -34,7 +36,7 @@ const CustomButton = ({
         variant={variant}
         disabled={disabled}
         endIcon={appendIcon}
-        startIcon={prependIcon}
+        startIcon={loading ? <CircularProgress size={20} /> : prependIcon}
         size={size}
       >
         {label}

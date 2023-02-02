@@ -16,6 +16,7 @@ interface PropTypes {
   onDiscard: (e: any) => void;
   saveLabel: string;
   discardLabel: string;
+  loading?: boolean;
 }
 
 const CustomModal = ({
@@ -26,6 +27,7 @@ const CustomModal = ({
   onSave,
   saveLabel,
   title,
+  loading = false,
 }: PropTypes) => {
   return (
     <Dialog open={open} onClose={onDiscard} maxWidth='xs' fullWidth>
@@ -41,7 +43,8 @@ const CustomModal = ({
         <CustomButton
           label={saveLabel}
           handleClick={onSave}
-          variant='contained'
+          variant='outlined'
+          loading={loading}
         />
       </DialogActions>
     </Dialog>

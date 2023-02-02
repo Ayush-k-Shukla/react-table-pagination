@@ -40,16 +40,7 @@ const CustomPagination = ({
         disabled={currentPage <= 1}
       />
 
-      {pages.map((page) => {
-        return (
-          <CustomButton
-            handleClick={() => goThisPage(page)}
-            key={page}
-            label={page as unknown as string}
-            variant={page === currentPage ? 'contained' : 'outlined'}
-          />
-        );
-      })}
+      {`Page ${currentPage} of ${possiblePages}`}
       <CustomButton
         handleClick={goNext}
         label='Next'

@@ -59,33 +59,7 @@
       }
     }
 
-    .tableHeader {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 15px;
-      align-items: center;
-      gap: 10px;
 
-      .leftHeader {
-        display: flex;
-        flex-direction: column;
-
-        .top {
-          display: flex;
-          gap: 10px;
-        }
-        .bottom {
-          display: flex;
-        }
-      }
-
-      .rightHeader {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-      }
-    }
   }
 }
 .devider {

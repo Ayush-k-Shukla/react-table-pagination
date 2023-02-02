@@ -21,8 +21,15 @@ export const downloadCSV = function (data: TableDataEntity[]) {
   link.click();
 };
 
-export const sortData = (data: TableDataEntity[], field: string) => {
-  data.sort((a, b) => (a[field] > b[field] ? 1 : b[field] > a[field] ? -1 : 0));
+export const sortData = (
+  data: TableDataEntity[],
+  field: string,
+  order: number
+) => {
+  data.sort((a, b) =>
+    a[field] > b[field] ? order * 1 : b[field] > a[field] ? order * -1 : 0
+  );
+  return data;
 };
 
 export const Data: TableDataEntity[] = [

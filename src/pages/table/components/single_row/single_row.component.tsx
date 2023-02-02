@@ -1,16 +1,27 @@
 import { Avatar, Chip } from '@mui/material';
-import { TableDataEntity } from '../../classes/interface';
-import styles from './singlerow.module.scss';
+import { TableDataEntity } from '../../../classes/interface';
+import styles from './single_row.module.scss';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
-import { CustomIconButton } from '../../../components';
+import { CustomIconButton } from '../../../../components';
+import { useQuery } from 'react-query';
+import { deleteUserById } from '../../../../api';
 
 interface PropTypes {
   rowData?: TableDataEntity;
-  handleDelete: (e: any) => any;
+  setDeleteModal: Function;
+  setEditModal: Function;
+  handleUserEdit: Function;
+  handleUserDelete: Function;
 }
 
-const SingleRow = ({ rowData, handleDelete }: PropTypes) => {
+const SingleRow = ({
+  rowData,
+  setDeleteModal,
+  setEditModal,
+  handleUserDelete,
+  handleUserEdit,
+}: PropTypes) => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.name}>
@@ -28,23 +39,34 @@ const SingleRow = ({ rowData, handleDelete }: PropTypes) => {
       </div>
       <div className={`${styles.status} secondary-text-color-large`}>
         <Chip
-          label={`Active`}
+          label={rowData?.status}
           size='small'
           color='warning'
           variant='outlined'
         />
       </div>
       <div className={`${styles.role} secondary-text-color-large`}>
-        {'Admin'}
+        {rowData?.gender}
       </div>
       <div className={`${styles.role} secondary-text-color-large`}>
-        June 20, 2002
+        {rowData?.id}
       </div>
+
       <div className={styles.buttons}>
-        <CustomIconButton handleClick={handleDelete}>
+        <CustomIconButton
+          handleClick={() => {
+            setDeleteModal(true);
+            handleUserDelete(rowData?.id);
+          }}
+        >
           <DeleteOutlineRoundedIcon />
         </CustomIconButton>
-        <CustomIconButton handleClick={() => {}}>
+        <CustomIconButton
+          handleClick={() => {
+            setEditModal(true);
+            handleUserEdit(rowData?.id);
+          }}
+        >
           <EditRoundedIcon />
         </CustomIconButton>
       </div>
