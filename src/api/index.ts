@@ -23,7 +23,7 @@ export const getUsers = async ({
 
 export const createUser = async ({ data }: { data: TableDataEntity }) => {
   const res = await API.post(`/`, data);
-  return res.data.json();
+  return res.data;
 };
 
 export const updateUserById = async ({
@@ -34,10 +34,10 @@ export const updateUserById = async ({
   data: TableDataEntity;
 }) => {
   const res = await API.patch(`/${id}`, data);
-  return res.data.json();
+  return res.data;
 };
 
 export const deleteUserById = async ({ id }: { id: number }) => {
   const res = await API.delete(`/${id}`);
-  return res.data.json();
+  return res.data;
 };

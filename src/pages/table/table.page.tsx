@@ -1,25 +1,20 @@
 import { useEffect, useState } from 'react';
 import { TableDataEntity } from '../classes/interface';
-import { QueryClient } from 'react-query';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import styles from './table.module.scss';
 import {
-  Data,
-  downloadCSV,
+  POSSIBLE_GENDER,
+  POSSIBLE_STATUS,
   sortData,
-  SUB_HEADING_MESSAGE,
 } from '../classes/constant';
 import SingleRow from './components/single_row/single_row.component';
 import {
-  CustomButton,
   CustomDropDown,
   CustomModal,
   CustomPagination,
 } from '../../components';
-import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
-import AddIcon from '@mui/icons-material/Add';
 import CustomInput, {
   CustomInputChangeFuncInterface,
 } from '../../components/CustomInput';
@@ -31,6 +26,8 @@ import {
 } from '../../api';
 import Chip from '@mui/material/Chip/Chip';
 import TableHeader from './components/table_header/table_header.component';
+import CircularProgress from '@mui/material/CircularProgress';
+import { Box, Snackbar } from '@mui/material';
 const PAGE_LIMIT = 10;
 const TOTAL_USER = 2500;
 
@@ -41,6 +38,7 @@ const TablePage = () => {
   const [deleteuserModal, setDeleteUserModal] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [deletedId, setDeletedId] = useState(1);
+  const [snackBarMessage, setSnackBarMessage] = useState('');
 
   const [filterState, setFilterState] = useState({
     name: 1,
@@ -67,23 +65,23 @@ const TablePage = () => {
     data: deleteUserData,
     error: deleteUserError,
     isLoading: deleteUserLoading,
-    refetch: deleteUserRefetch,
+    mutate: deleteUserRefetch,
     isSuccess: deleteUserSuccess,
-  } = useQuery(
+  } = useMutation(
     'deleteUser',
     async () => {
       return await deleteUserById({ id: deletedId });
     },
-    { enabled: false, retry: false }
+    { retry: false }
   );
 
   const {
     data: updateUserData,
     error: updateUserError,
     isLoading: updateUserLoading,
-    refetch: updateUserRefetch,
+    mutate: updateUserRefetch,
     isSuccess: updateUsersSuccess,
-  } = useQuery(
+  } = useMutation(
     'updateUser',
     async () => {
       return await updateUserById({
@@ -91,7 +89,7 @@ const TablePage = () => {
         data: singleUserData,
       });
     },
-    { enabled: false, retry: false }
+    { retry: false }
   );
 
   const {
@@ -99,27 +97,73 @@ const TablePage = () => {
     data: createUserData,
     error: createUserError,
     isLoading: createUserLoading,
-    refetch: createUserRefetch,
+    mutate: createUserRefetch,
     isSuccess: createUsersSuccess,
-  } = useQuery(
+  } = useMutation(
     'createUser',
     async () => {
       return await createUser({
         data: singleUserData,
       });
     },
-    { enabled: false, retry: false }
+    { retry: false }
   );
+  console.log({ deleteUserSuccess });
 
   useEffect(() => {
     if (usersData) {
       setTableData(usersData);
     }
-  }, [getUserLoading, currentPage]);
+  }, [usersData, currentPage]);
 
   useEffect(() => {
-    setDeleteUserModal(false);
-  }, [deleteUserSuccess]);
+    console.log({ createUserError });
+    if (createUserError) {
+      setSnackBarMessage(
+        `${(createUserError as any)?.response?.data?.[0]?.field} ${
+          (createUserError as any)?.response?.data?.[0]?.message
+        }`
+      );
+
+      if (updateUserError) {
+        setSnackBarMessage(
+          `${(updateUserError as any)?.response?.data?.[0]?.field} ${
+            (updateUserError as any)?.response?.data?.[0]?.message
+          }`
+        );
+      }
+      if (deleteUserError) {
+        setSnackBarMessage(
+          `${(deleteUserError as any)?.response?.data?.[0]?.field} ${
+            (deleteUserError as any)?.response?.data?.[0]?.message
+          }`
+        );
+      }
+      if (getUsersError) {
+        setSnackBarMessage(
+          `${(getUsersError as any)?.response?.data?.[0]?.field} ${
+            (getUsersError as any)?.response?.data?.[0]?.message
+          }`
+        );
+      }
+    }
+  }, [createUserError, updateUserError, deleteUserError, getUsersError]);
+
+  useEffect(() => {
+    if (deleteUserSuccess) {
+      setDeleteUserModal(false);
+      getUsersRefetch();
+    }
+    if (createUsersSuccess) {
+      setAddUserModal(false);
+      getUsersRefetch();
+    }
+
+    if (updateUsersSuccess) {
+      setAddUserModal(false);
+      getUsersRefetch();
+    }
+  }, [createUsersSuccess, deleteUserSuccess, updateUsersSuccess]);
 
   useEffect(() => {
     getUsersRefetch();
@@ -142,16 +186,30 @@ const TablePage = () => {
     setSingleUserData({ ...singleUserData, [e.name]: e.value });
   };
 
+  const getFilterStateByName = (name: string): number => {
+    switch (name) {
+      case 'name':
+        return filterState.name;
+      case 'status':
+        return filterState.status;
+      case 'gender':
+        return filterState.gender;
+      case 'id':
+        return filterState.id;
+    }
+    return 1;
+  };
+
   const applyFilter = (filterType: string) => {
     const INV = -1;
     const filteredData = sortData(
       TableData,
       filterType,
-      INV * filterState[filterType]
+      INV * getFilterStateByName(filterType)
     );
     setFilterState({
       ...filterState,
-      [filterType]: INV * filterState[filterType],
+      [filterType]: INV * getFilterStateByName(filterType),
     });
     setTableData([...filteredData]);
   };
@@ -163,9 +221,9 @@ const TablePage = () => {
 
   const saveUser = () => {
     if (singleUserData.id) {
-      createUserRefetch();
-    } else {
       updateUserRefetch();
+    } else {
+      createUserRefetch();
     }
   };
 
@@ -181,6 +239,14 @@ const TablePage = () => {
 
   return (
     <>
+      {/**Snackbar to show errors */}
+      <Snackbar
+        anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+        open={!!snackBarMessage.length}
+        onClose={() => setSnackBarMessage('')}
+        message={snackBarMessage}
+      />
+
       {/** Modal to add user */}
       <CustomModal
         open={adduserModal}
@@ -216,7 +282,7 @@ const TablePage = () => {
             label='Status'
             name='status'
             placeholder='Enter status'
-            options={['active', 'inactive', 'invited']}
+            options={POSSIBLE_STATUS}
           />
           <CustomDropDown
             handleValueChange={changeUserInfo}
@@ -224,7 +290,7 @@ const TablePage = () => {
             label='Gender'
             name='gender'
             placeholder='Enter gender'
-            options={['male', 'female', 'trans']}
+            options={POSSIBLE_GENDER}
           />
         </div>
       </CustomModal>
@@ -254,86 +320,92 @@ const TablePage = () => {
           <hr className={styles.devider} />
 
           {/** table content*/}
-          <div className={styles.tableContent}>
-            <div className={styles.colums}>
-              <div
-                className={styles.name}
-                onClick={() => {
-                  applyFilter('name');
-                }}
-              >
-                <p>Name</p>
-                {filterState.name === 1 ? (
-                  <ArrowUpwardOutlinedIcon />
-                ) : (
-                  <ArrowDownwardOutlinedIcon />
-                )}
-              </div>
-              <div
-                className={styles.status}
-                onClick={() => {
-                  applyFilter('status');
-                }}
-              >
-                <p>Status</p>
-                {filterState.status === 1 ? (
-                  <ArrowUpwardOutlinedIcon />
-                ) : (
-                  <ArrowDownwardOutlinedIcon />
-                )}
-              </div>
-              <div
-                className={styles.role}
-                onClick={() => {
-                  applyFilter('gender');
-                }}
-              >
-                <p>Gender</p>
-                {filterState.gender === 1 ? (
-                  <ArrowUpwardOutlinedIcon />
-                ) : (
-                  <ArrowDownwardOutlinedIcon />
-                )}
-              </div>
-              <div
-                className={styles.login}
-                onClick={() => {
-                  applyFilter('id');
-                }}
-              >
-                <p>ID</p>
-                {filterState.id === 1 ? (
-                  <ArrowUpwardOutlinedIcon />
-                ) : (
-                  <ArrowDownwardOutlinedIcon />
-                )}
-              </div>
-              <div className={styles.login}></div>
+          {getUserLoading ? (
+            <div className={styles.loadinScreen}>
+              <CircularProgress />
             </div>
-            <hr className={styles.devider} />
-
-            {TableData?.map((row, index) => {
-              return (
-                <div key={index}>
-                  <SingleRow
-                    rowData={row}
-                    setDeleteModal={setDeleteUserModal}
-                    setEditModal={setAddUserModal}
-                    handleUserDelete={handleUserDelete}
-                    handleUserEdit={handleUserEdit}
-                  />
-                  <hr className={styles.devider} />
+          ) : (
+            <div className={styles.tableContent}>
+              <div className={styles.colums}>
+                <div
+                  className={styles.name}
+                  onClick={() => {
+                    applyFilter('name');
+                  }}
+                >
+                  <p>Name</p>
+                  {filterState.name === -1 ? (
+                    <ArrowUpwardOutlinedIcon />
+                  ) : (
+                    <ArrowDownwardOutlinedIcon />
+                  )}
                 </div>
-              );
-            })}
+                <div
+                  className={styles.status}
+                  onClick={() => {
+                    applyFilter('status');
+                  }}
+                >
+                  <p>Status</p>
+                  {filterState.status === -1 ? (
+                    <ArrowUpwardOutlinedIcon />
+                  ) : (
+                    <ArrowDownwardOutlinedIcon />
+                  )}
+                </div>
+                <div
+                  className={styles.role}
+                  onClick={() => {
+                    applyFilter('gender');
+                  }}
+                >
+                  <p>Gender</p>
+                  {filterState.gender === -1 ? (
+                    <ArrowUpwardOutlinedIcon />
+                  ) : (
+                    <ArrowDownwardOutlinedIcon />
+                  )}
+                </div>
+                <div
+                  className={styles.login}
+                  onClick={() => {
+                    applyFilter('id');
+                  }}
+                >
+                  <p>ID</p>
+                  {filterState.id === -1 ? (
+                    <ArrowUpwardOutlinedIcon />
+                  ) : (
+                    <ArrowDownwardOutlinedIcon />
+                  )}
+                </div>
+                <div className={styles.login}></div>
+              </div>
+              <hr className={styles.devider} />
 
-            <CustomPagination
-              currentPage={currentPage}
-              showPerPage={PAGE_LIMIT}
-              setCurrentPage={changeActivePage}
-              total={TOTAL_USER}
-            />
-          </div>
+              {TableData?.map((row, index) => {
+                return (
+                  <div key={index}>
+                    <SingleRow
+                      rowData={row}
+                      setDeleteModal={setDeleteUserModal}
+                      setEditModal={setAddUserModal}
+                      handleUserDelete={handleUserDelete}
+                      handleUserEdit={handleUserEdit}
+                    />
+                    <hr className={styles.devider} />
+                  </div>
+                );
+              })}
+
+              <CustomPagination
+                currentPage={currentPage}
+                showPerPage={PAGE_LIMIT}
+                setCurrentPage={changeActivePage}
+                total={TOTAL_USER}
+              />
+            </div>
+          )}
         </div>
       </div>
     </>
