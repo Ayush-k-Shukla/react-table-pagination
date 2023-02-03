@@ -41,7 +41,7 @@ const SingleRow = ({
         <Chip
           label={rowData?.status}
           size='small'
-          color='warning'
+          color={rowData?.status === 'active' ? 'warning' : 'error'}
           variant='outlined'
         />
       </div>

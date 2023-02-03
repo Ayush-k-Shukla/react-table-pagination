@@ -3,9 +3,11 @@ import { TableDataEntity } from '../classes/interface';
 import { useMutation, useQuery } from 'react-query';
 import styles from './table.module.scss';
 import {
+  PAGE_LIMIT,
   POSSIBLE_GENDER,
   POSSIBLE_STATUS,
   sortData,
+  TOTAL_USER,
 } from '../classes/constant';
 import SingleRow from './components/single_row/single_row.component';
 import {
@@ -24,12 +26,9 @@ import {
   getUsers,
   updateUserById,
 } from '../../api';
-import Chip from '@mui/material/Chip/Chip';
 import TableHeader from './components/table_header/table_header.component';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Box, Snackbar } from '@mui/material';
-const PAGE_LIMIT = 10;
-const TOTAL_USER = 2500;
 
 const TablePage = () => {
   const [TableData, setTableData] = useState<TableDataEntity[]>([{}]);
@@ -108,7 +107,6 @@ const TablePage = () => {
     },
     { retry: false }
   );
-  console.log({ deleteUserSuccess });
 
   useEffect(() => {
     if (usersData) {
@@ -117,35 +115,34 @@ const TablePage = () => {
   }, [usersData, currentPage]);
 
   useEffect(() => {
-    console.log({ createUserError });
     if (createUserError) {
       setSnackBarMessage(
         `${(createUserError as any)?.response?.data?.[0]?.field} ${
           (createUserError as any)?.response?.data?.[0]?.message
         }`
       );
+    }
 
-      if (updateUserError) {
-        setSnackBarMessage(
-          `${(updateUserError as any)?.response?.data?.[0]?.field} ${
-            (updateUserError as any)?.response?.data?.[0]?.message
-          }`
-        );
-      }
-      if (deleteUserError) {
-        setSnackBarMessage(
-          `${(deleteUserError as any)?.response?.data?.[0]?.field} ${
-            (deleteUserError as any)?.response?.data?.[0]?.message
-          }`
-        );
-      }
-      if (getUsersError) {
-        setSnackBarMessage(
-          `${(getUsersError as any)?.response?.data?.[0]?.field} ${
-            (getUsersError as any)?.response?.data?.[0]?.message
-          }`
-        );
-      }
+    if (updateUserError) {
+      setSnackBarMessage(
+        `${(updateUserError as any)?.response?.data?.[0]?.field} ${
+          (updateUserError as any)?.response?.data?.[0]?.message
+        }`
+      );
+    }
+    if (deleteUserError) {
+      setSnackBarMessage(
+        `${(deleteUserError as any)?.response?.data?.[0]?.field} ${
+          (deleteUserError as any)?.response?.data?.[0]?.message
+        }`
+      );
+    }
+    if (getUsersError) {
+      setSnackBarMessage(
+        `${(getUsersError as any)?.response?.data?.[0]?.field} ${
+          (getUsersError as any)?.response?.data?.[0]?.message
+        }`
+      );
     }
   }, [createUserError, updateUserError, deleteUserError, getUsersError]);
 
@@ -179,8 +176,6 @@ const TablePage = () => {
     );
     setSingleUserData(dataById[0]);
   };
-
-  console.log({ TableData });
 
   const changeUserInfo = (e: CustomInputChangeFuncInterface) => {
     setSingleUserData({ ...singleUserData, [e.name]: e.value });
@@ -235,8 +230,6 @@ const TablePage = () => {
     setCurrentPage(page);
   };
 
-  console.log({ singleUserData });
-
   return (
     <>
       {/**Snackbar to show errors */}
@@ -247,12 +240,12 @@ const TablePage = () => {
         message={snackBarMessage}
       />
 
-      {/** Modal to add user */}
+      {/** Modal to add/update user */}
       <CustomModal
         open={adduserModal}
         discardLabel='Cancel'
-        saveLabel='Save'
-        title='Add User'
+        saveLabel={singleUserData.id ? 'Update' : 'Save'}
+        title={singleUserData.id ? 'Update User' : 'Add User'}
         onDiscard={() => setAddUserModal(false)}
         onSave={saveUser}
         loading={createUserLoading || updateUserLoading}
@@ -267,15 +260,17 @@ const TablePage = () => {
             placeholder='Enter name'
             type='text'
           />
-          <CustomInput
-            handleValueChange={changeUserInfo}
-            value={singleUserData.email || ''}
-            fullWidth
-            label='Email'
-            name='email'
-            placeholder='Enter email'
-            type='text'
-          />
+          {!singleUserData?.id && (
+            <CustomInput
+              handleValueChange={changeUserInfo}
+              value={singleUserData.email || ''}
+              fullWidth
+              label='Email'
+              name='email'
+              placeholder='Enter email'
+              type='text'
+            />
+          )}
           <CustomDropDown
             handleValueChange={changeUserInfo}
             value={singleUserData.status || ''}

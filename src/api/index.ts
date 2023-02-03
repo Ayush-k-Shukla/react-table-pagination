@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { PAGE_LIMIT } from '../pages/classes/constant';
 import { TableDataEntity } from '../pages/classes/interface';
 
 const baseUrl = `https://gorest.co.in/public/v2/users`;
@@ -9,7 +10,7 @@ API.defaults.headers.common[
 
 export const getUsers = async ({
   page,
-  per_page = 10,
+  per_page = PAGE_LIMIT,
 }: {
   page: number;
   per_page?: number;
@@ -17,7 +18,7 @@ export const getUsers = async ({
   const res = await API.get<TableDataEntity[]>(
     `?page=${page}&per_page=${per_page}`
   );
-  console.log(res.data);
+
   return res.data;
 };
 

@@ -11,10 +11,8 @@ function convertToCSV(arr: TableDataEntity[]) {
 }
 
 export const downloadCSV = function (data: TableDataEntity[]) {
-  console.log(convertToCSV(data));
   const blob = new Blob([convertToCSV(data)], { type: 'text/csv' });
   const url = window.URL.createObjectURL(blob);
-  console.log('u:', url);
   const link = document.createElement('a');
   link.href = url;
   link.download = 'filename';
@@ -58,3 +56,5 @@ export const SUB_HEADING_MESSAGE =
 
 export const POSSIBLE_STATUS = ['active', 'inactive'];
 export const POSSIBLE_GENDER = ['male', 'female'];
+export const PAGE_LIMIT = 5;
+export const TOTAL_USER = 2400;

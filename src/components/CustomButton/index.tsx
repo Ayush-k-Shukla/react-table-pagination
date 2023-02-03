@@ -1,7 +1,4 @@
-import { Button, CircularProgress, IconButton } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { ReactNode } from 'react';
-
+import { Button, CircularProgress } from '@mui/material';
 interface PropTypes {
   handleClick: (e: any) => any;
   label: string;
